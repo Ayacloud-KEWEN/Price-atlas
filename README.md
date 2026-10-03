@@ -15,12 +15,12 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-然后用浏览器打开 `http://<树莓派地址>:3000`（手机与电脑在同一局域网即可）。
+然后用浏览器打开 `http://<树莓派地址>:8500`（手机与电脑在同一局域网即可）。
 
 - 数据库迁移与预置分类在应用启动时自动执行（幂等）。
 - 镜像基于多架构的 `node:22-alpine` / `postgres:17-alpine`，在 arm64（树莓派 5）上直接构建运行。
 - 默认通过 HTTP 在家庭局域网使用，`COOKIE_SECURE=false`。若你自己在前面加了 HTTPS 反向代理，请改为 `true`。
-- **请勿把 3000 端口直接映射到公网。** 如需外网访问，请自行使用 VPN（如 WireGuard / Tailscale）或带认证的反向代理。
+- **请勿把 8500 端口直接映射到公网。** 如需外网访问，请自行使用 VPN（如 WireGuard / Tailscale）或带认证的反向代理。
 
 常用命令：
 
