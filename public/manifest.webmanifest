@@ -1,0 +1,11 @@
+{
+  "name": "Price Atlas",
+  "short_name": "Price Atlas",
+  "description": "多品类商品价格收集器（私人使用）",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f6f2",
+  "theme_color": "#1f4d3a",
+  "lang": "zh-CN",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

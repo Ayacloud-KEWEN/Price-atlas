@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #f6f6f2;
+  --color-surface: #ffffff;
+  --color-ink: #1b2420;
+  --color-muted: #5f6b65;
+  --color-line: #dcdfd8;
+  --color-brand: #1f4d3a;
+  --color-brand-600: #2a6049;
+  --color-brand-50: #e8f0ea;
+  --color-warn: #8a5a00;
+  --color-warn-50: #fbf1d9;
+  --color-danger: #a02a2a;
+  --color-danger-50: #f8e3e1;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+}
+
+html, body { background: var(--color-bg); color: var(--color-ink); font-family: var(--font-sans); }
+body { -webkit-text-size-adjust: 100%; }
+
+@layer components {
+  .card { @apply rounded-xl border border-line bg-surface; }
+  .btn { @apply inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-line bg-surface px-4 text-sm font-medium text-ink
+    hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-primary { @apply border-brand bg-brand text-white hover:bg-brand-600; }
+  .btn-danger { @apply border-danger text-danger hover:bg-danger-50; }
+  .btn-sm { @apply min-h-9 px-3 text-xs; }
+  .input { @apply block min-h-11 w-full rounded-lg border border-line bg-white px-3 py-2 text-base text-ink placeholder:text-muted/70
+    focus:border-brand focus:outline-2 focus:outline-offset-0 focus:outline-brand/40 disabled:bg-bg md:text-sm; }
+  .input-error { @apply border-danger; }
+  .label { @apply mb-1 block text-sm font-medium text-ink; }
+  .hint { @apply mt-1 text-xs text-muted; }
+  .err { @apply mt-1 text-xs font-medium text-danger; }
+  .chip { @apply inline-flex items-center gap-1 rounded-full border border-line bg-white px-2.5 py-0.5 text-xs text-muted; }
+  .badge { @apply inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium; }
+  .tbl { @apply w-full border-collapse text-sm; }
+  .tbl th { @apply border-b border-line bg-bg px-3 py-2 text-left text-xs font-semibold text-muted; }
+  .tbl td { @apply border-b border-line/70 px-3 py-2 align-top; }
+  .tbl tr:hover td { @apply bg-brand-50/40; }
+  .num { @apply text-right tabular-nums; }
+  .section-title { @apply text-sm font-semibold text-ink; }
+}
+
+:focus-visible { outline: 2px solid var(--color-brand); outline-offset: 2px; }
+details > summary { cursor: pointer; list-style: none; }
+details > summary::-webkit-details-marker { display: none; }

@@ -1,0 +1,44 @@
+# Price Atlas —— 私人使用，默认只监听本机端口，不会自动暴露到公网。
+# 用法：cp .env.example .env（修改密码）→ docker compose up -d --build
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-priceatlas}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?请在 .env 中设置 POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-priceatlas}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-priceatlas}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-priceatlas}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?请在 .env 中设置 ADMIN_PASSWORD}
+      SESSION_SECRET: ${SESSION_SECRET:?请在 .env 中设置 SESSION_SECRET}
+      SESSION_DAYS: ${SESSION_DAYS:-30}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      UPLOAD_DIR: /data/uploads
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-15}
+      MAX_PHOTOS_PER_RECORD: ${MAX_PHOTOS_PER_RECORD:-12}
+    volumes:
+      - uploads:/data/uploads
+    ports:
+      - "${APP_PORT:-3000}:3000"
+
+volumes:
+  pgdata:
+    name: priceatlas_pgdata
+  uploads:
+    name: priceatlas_uploads
