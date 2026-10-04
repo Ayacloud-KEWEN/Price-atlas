@@ -26,13 +26,13 @@
       <!-- 手机顶栏 -->
       <header class="sticky top-0 z-20 flex items-center justify-between border-b border-line bg-surface/95 px-4 py-2 backdrop-blur md:hidden">
         <NuxtLink to="/" class="font-semibold text-brand">Price Atlas</NuxtLink>
-        <details class="relative">
-          <summary class="btn btn-sm" aria-label="更多页面">更多 ▾</summary>
-          <div class="absolute right-0 mt-1 w-44 rounded-lg border border-line bg-surface p-1 shadow-lg">
-            <NuxtLink v-for="l in moreLinks" :key="l.to" :to="l.to" class="block rounded px-3 py-2 text-sm hover:bg-brand-50">{{ l.label }}</NuxtLink>
+        <div ref="moreRoot" class="relative">
+          <button type="button" class="btn btn-sm" aria-haspopup="true" :aria-expanded="moreOpen" @click="moreOpen = !moreOpen">更多 {{ moreOpen ? '▴' : '▾' }}</button>
+          <div v-if="moreOpen" class="absolute right-0 mt-1 w-44 rounded-lg border border-line bg-surface p-1 shadow-lg">
+            <NuxtLink v-for="l in moreLinks" :key="l.to" :to="l.to" class="block rounded px-3 py-2 text-sm hover:bg-brand-50" @click="moreOpen = false">{{ l.label }}</NuxtLink>
             <button class="block w-full rounded px-3 py-2 text-left text-sm hover:bg-brand-50" @click="logout">退出登录</button>
           </div>
-        </details>
+        </div>
       </header>
 
       <SyncBanner />
@@ -55,6 +55,14 @@
 
 <script setup lang="ts">
 const sync = useSyncEngine()
+const moreOpen = ref(false)
+const moreRoot = ref<HTMLElement | null>(null)
+const route = useRoute()
+watch(() => route.fullPath, () => { moreOpen.value = false })
+function onDocClick(e: Event) { if (moreOpen.value && moreRoot.value && !moreRoot.value.contains(e.target as Node)) moreOpen.value = false }
+function onKey(e: KeyboardEvent) { if (e.key === 'Escape') moreOpen.value = false }
+onMounted(() => { document.addEventListener('click', onDocClick); document.addEventListener('keydown', onKey) })
+onBeforeUnmount(() => { document.removeEventListener('click', onDocClick); document.removeEventListener('keydown', onKey) })
 const tabs = computed(() => [
   { to: '/', label: '采集' },
   { to: '/drafts', label: '草稿', badge: sync.unsyncedCount.value || 0 },
