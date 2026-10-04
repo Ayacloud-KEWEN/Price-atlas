@@ -35,7 +35,7 @@ services:
     volumes:
       - uploads:/data/uploads
     ports:
-      - "${APP_PORT:-8500}:3000"
+      - "${APP_BIND:-0.0.0.0}:${APP_PORT:-8500}:3000"
 
 volumes:
   pgdata:
