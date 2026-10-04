@@ -292,7 +292,7 @@ const sync = useSyncEngine()
 const toast = useToast()
 const router = useRouter()
 
-const lastCurrency = (() => { try { return localStorage.getItem('pa_currency') || 'CNY' } catch { return 'CNY' } })()
+const lastCurrency = (() => { try { return localStorage.getItem('pa_currency') || 'EUR' } catch { return 'EUR' } })()
 
 const blank = () => ({
   clientId: uid() as string,
@@ -560,7 +560,7 @@ async function save(status: 'draft' | 'pending', next: boolean) {
       clientId: p.clientId, recordId: rec.clientId, kind: p.kind, name: p.name, size: p.size, mime: p.mime, state: 'queued', blob: p.blob,
     }))
     await localDb.saveRecord(rec, localPhotos) // 先落本机，再同步
-    try { localStorage.setItem('pa_currency', form.currency || 'CNY'); if (form.merchantId && form.merchantId !== '__new') localStorage.setItem('pa_merchant', form.merchantId) } catch {}
+    try { localStorage.setItem('pa_currency', form.currency || 'EUR'); if (form.merchantId && form.merchantId !== '__new') localStorage.setItem('pa_merchant', form.merchantId) } catch {}
     await sync.refresh()
     sync.syncAll() // 在线则立即同步；离线则等待 online 事件
     toast.success(status === 'draft' ? '已存为草稿（先保存在本机，联网后同步）' : '已保存到本机，正在同步…')

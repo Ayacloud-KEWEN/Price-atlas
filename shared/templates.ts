@@ -173,4 +173,4 @@ export const STOCK_STATUS: Record<string, string> = { in_stock: '有货', low: '
 export const CONDITIONS: Record<string, string> = { new: '全新', near_expiry: '临期', used: '二手/开封', unknown: '未知' }
 export const BIZ_STATUS: Record<string, string> = { draft: '草稿', pending: '待核查', confirmed: '已确认', void: '已作废' }
 export const ATTACHMENT_KINDS: Record<string, string> = { front: '正面', back: '背标', price_tag: '价签', other: '其他' }
-export const CURRENCIES = ['CNY', 'EUR', 'USD', 'GBP', 'JPY', 'HKD', 'CHF', 'AUD', 'CAD', 'SGD', 'KRW', 'RUB', 'TRY', 'AED']
+export const CURRENCIES = ['EUR', 'CNY', 'USD', 'GBP', 'JPY', 'HKD', 'CHF', 'AUD', 'CAD', 'SGD', 'KRW', 'RUB', 'TRY', 'AED']
