@@ -133,7 +133,7 @@ export function useSyncEngine() {
     })
     window.addEventListener('offline', () => { online.value = false })
     setInterval(() => { if (online.value && !running) syncAll() }, 30_000)
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {})
+    if (!import.meta.dev && 'serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {})
   }
 
   return { records, online, busy, unsyncedCount, failedCount, refresh, syncAll, syncOne, retry, hold, remove, enqueue, start }
