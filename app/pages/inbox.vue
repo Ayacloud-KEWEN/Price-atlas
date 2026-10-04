@@ -11,6 +11,7 @@
       <input v-model="q" type="search" class="input !w-56" placeholder="搜索名称 / 备注" aria-label="搜索" />
       <label class="flex items-center gap-1.5 text-sm"><input v-model="onlyUnlinked" type="checkbox" class="h-4 w-4 accent-brand" /> 仅未关联商品</label>
       <span class="ml-auto text-sm text-muted">共 {{ total }} 条</span>
+      <button class="btn btn-primary btn-sm" :disabled="busy || !pendingTotal" @click="confirmAll">✓ 一键全部核查通过（{{ pendingTotal }} 条待核查）</button>
     </div>
 
     <!-- 批量操作 -->
@@ -30,7 +31,7 @@
     <div v-if="bulkResult" class="mb-3 rounded-lg border border-brand/40 bg-brand-50 p-3 text-sm" role="status">
       <b>批量操作完成：</b>成功更新 {{ bulkResult.updated }} 条<span v-if="bulkResult.productsUpdated">，其中同步修改了 {{ bulkResult.productsUpdated }} 个已关联商品的分类（历史价格记录保留各自的分类快照）</span>。
       <ul v-if="bulkResult.skipped.length" class="mt-1 list-disc pl-5 text-danger">
-        <li v-for="s in bulkResult.skipped" :key="s.id">已跳过 {{ nameOf(s.id) }}：{{ s.reason }}</li>
+        <li v-for="s in bulkResult.skipped" :key="s.id">已跳过 <NuxtLink :to="`/quotes/${s.id}`" class="underline">{{ s.name || nameOf(s.id) }}</NuxtLink>：{{ s.reason }}</li>
       </ul>
     </div>
 
@@ -84,6 +85,22 @@ const selected = ref(new Set<string>())
 const bulkCat = ref('')
 const bulkTag = ref('')
 const busy = ref(false)
+const pendingTotal = ref(0)
+async function loadPendingTotal() {
+  try { pendingTotal.value = (await api<{ total: number }>('/api/observations', { query: { status: 'pending', limit: 1 } })).total } catch { /* 忽略 */ }
+}
+async function confirmAll() {
+  const msg = `将把全部 ${pendingTotal.value} 条“待核查”记录标记为“已确认”。\n\n· 未关联商品规格、或必填信息不全的记录会被自动跳过并列出原因；\n· 之后可在单条记录里“退回待核查”。\n\n确定吗？`
+  if (!confirm(msg)) return
+  busy.value = true; bulkResult.value = null
+  try {
+    const r = await api('/api/observations/bulk', { method: 'POST', body: { action: 'confirmAllPending' } })
+    bulkResult.value = r
+    toast.success(`已确认 ${r.updated} 条${r.skipped.length ? `，跳过 ${r.skipped.length} 条（见下方原因）` : ''}`)
+    selected.value = new Set()
+    await fetchPage(true); await loadPendingTotal()
+  } catch (e: any) { toast.error(`一键核查失败：${e.message}`) } finally { busy.value = false }
+}
 const bulkResult = ref<any>(null)
 let timer: any
 
@@ -103,7 +120,7 @@ async function fetchPage(reset: boolean) {
 }
 const more = () => fetchPage(false)
 watch([tab, onlyUnlinked, q], () => { clearTimeout(timer); timer = setTimeout(() => { selected.value = new Set(); fetchPage(true) }, 200) })
-onMounted(async () => { await load().catch(() => {}); await fetchPage(true) })
+onMounted(async () => { await load().catch(() => {}); await fetchPage(true); await loadPendingTotal() })
 
 async function bulk(action: Record<string, any>) {
   busy.value = true; bulkResult.value = null
@@ -113,7 +130,7 @@ async function bulk(action: Record<string, any>) {
     toast.success(`已更新 ${r.updated} 条${r.skipped.length ? `，跳过 ${r.skipped.length} 条` : ''}`)
     bulkCat.value = ''; bulkTag.value = ''
     await load(true).catch(() => {})
-    await fetchPage(true)
+    await fetchPage(true); await loadPendingTotal()
     selected.value = new Set()
   } catch (e: any) { toast.error(`批量操作失败：${e.message}`) } finally { busy.value = false }
 }
